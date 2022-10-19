@@ -1,0 +1,5 @@
+SMPL_female.pkl
+SMPL_male.pkl
+SMPL_neutral.pkl
+SMPL_high_res_mapping.pkl
+SMPL_low_res_mapping.pkl
