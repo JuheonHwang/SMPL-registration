@@ -1,0 +1,6 @@
+import trimesh
+
+subject = ...
+scan_file = ...
+scan_mesh = trimesh.load(scan_file, process=False)
+

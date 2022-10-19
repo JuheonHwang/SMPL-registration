@@ -1,0 +1,25 @@
+F:\2_Personal\jmg\kinect_mkv_extractor\sub_process\color_and_depth_separate5\Output\RGB_images\output\smpl
+에 있는 것과 같이 EasyMocap의 output을 얻음
+
+이 중 keypoints3d, smpl 폴더 안의 결과를 사용
+이때, registration에서 smpl의 parameter를 pkl 형식으로 사용하고 EasyMocap의 output과 형식이 조금 다르기 때문에 smpl 폴더 안의 결과를 전처리함
+(전처리는 F:\2_Personal\hjh\for_garment_opencv\SMPL_json_to_pkl.py를 사용함)
+
+ply 형식의 3D scan data와 앞서 언급한 keypoints3d(json), smpl(pkl)을 이용하여 registration 진행
+(F:\2_Personal\hjh\MPI_MeshRegistration-main\smpl_registration\fit_SMPLD.py을 통해 진행)
+
+fit_SMPLD.py 코드는 아래의 순서를 통해 registration 함
+1. EasyMocap을 통해 얻은 translation과 registration의 translation이 조금 다르기 때문에 이를 5 iteration 동안 맞춤
+그 후 다음 5 iteration 동안 translation과 top betas (SMPL shape parameter의 앞의 2개)를 최적화하여 translation과 SMPL 크기를 맞춤
+2. SMPL을 그대로 registration에 사용하면 SMPL이 가지고 있는 굴곡 (ex 배꼽, 허리와 배의 경계) 등이 registration 결과에 나타나기 때문에
+SMPL을 최대한 smoothing 하기 위해 laplacian term의 weight를 크게 하여 SMPL smoothing을 진행함
+3. SMPL smoothing 후 어느 정도 target 3D scan의 형태를 띄게 하기 위해 laplacian term의 weight를 줄이고 3D scan과의 term의 weight를 늘림
+4. SMPL의 subdivision matrix를 통해 high resolution SMPL(vertex 약 27,000개, 기본 SMPL은 6890개)을 3번의 결과로 부터 얻고 마지막 registration 진행
+5. 4를 통해 얻은 high resolution SMPL을 다시 기본 SMPL로 바꾸는 matrix를 통해 high resolution version과 기본 version의 SMPL registration 결과 얻음
+
+registration input: 3D scan, 3D keypoints (in openpose 25 joints form), SMPL parameters
+registration output: high resolution registrated SMPL, original resolution registrated SMPL, output of #3 SMPL, output of #1 SMPL, output of #3 SMPL parameters, output of #1 SMPL parameters
+(*_smpld_hres.ply, *_smpld_hres2lres.ply, *_smpld.ply, *_smpl.ply, *_smpld.pkl, *_smpl.pkl)
+
+
+SMPL의 LBS는 EasyMocap을 따름
